@@ -1,0 +1,59 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - '**'  # Trigger on push to any branch
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Check out the repo
+    - name: Checkout code
+      uses: actions/checkout@v3  # Use the latest version
+
+    # Set up Go
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: '1.21'  # Match this with your Go version
+
+    # Cache Go modules
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: /home/runner/go/pkg/mod  # Correct path for GitHub-hosted runners
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    # Run go vet for quality checks
+    - name: Run go vet
+      run: go vet ./...
+
+    # Run tests and generate coverage report
+    - name: Run tests
+      run: go test -v ./... -cover -coverprofile=coverage/coverage.out
+
+    # Build and push Docker image if it's a push to the main branch or other protected branches
+    - name: Set up Docker Buildx
+      if: github.ref == 'refs/heads/main'
+      uses: docker/setup-buildx-action@v2
+
+    - name: Login to Docker Hub
+      if: github.ref == 'refs/heads/main'
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+    - name: Build and push Docker image
+      if: github.ref == 'refs/heads/main'
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: pachico/snitch:${{ github.sha }}, pachico/snitch:latest
