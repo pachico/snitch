@@ -56,4 +56,5 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: pachico/snitch:${{ github.sha }}, pachico/snitch:latest
+        # tags: pachico/snitch:${{ github.sha }}, pachico/snitch:latest
+        tags: pachico/snitch:latest

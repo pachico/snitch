@@ -6,9 +6,10 @@ Its purpose is to aid debugging in development, testing, and production environm
 
 - [snitch](#snitch)
   - [Usage](#usage)
+  - [Environment Variables](#environment-variables)
   - [Featured Endpoints](#featured-endpoints)
     - [System Information](#system-information)
-    - [Environment Variables](#environment-variables)
+    - [Environment Variables](#environment-variables-1)
     - [DNS Resolution](#dns-resolution)
     - [HTTP Requests and Responses](#http-requests-and-responses)
     - [Filesystem Information](#filesystem-information)
@@ -27,6 +28,12 @@ docker run --rm -p 8080:1323 --env SNITCH_PORT=1323 pachico/snitch:latest
 This makes the application available at `http://localhost:8080`.
 
 Deploying it in a Kubernetes cluster allows for retrieving information about the pod it's running in.
+
+## Environment Variables
+
+The following environment variables can be set to customize the application:
+
+- `SNITCH_PORT`: The port the application listens on. Default is `1323`.
 
 ## Featured Endpoints
 
